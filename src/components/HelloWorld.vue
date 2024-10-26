@@ -204,6 +204,7 @@
 
 <script>
 import { initDB, addClient,  addSheet, getSheet} from '../db.js';
+import { useToast } from 'vue-toastification';
 import { nextTick } from 'vue';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
@@ -328,23 +329,43 @@ export default {
     },
 
     async startNewDailySheet() {
-  await initDB();
-  this.currentSheet = { date: new Date().toISOString().split('T')[0], entries: [] };
-  this.isSheetActive = true;
-  this.isCurrentSheet = true;
-  alert('Nouvelle fiche démarrée pour la date : ' + this.currentSheet.date);
-},
-saveDailySheet() {
+  initDB().then(() => {
+    // Obtenir la date locale sans le décalage UTC
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    
+    const formattedDate = `${year}-${month}-${day}`; // Format YYYY-MM-DD sans décalage
+
+    this.currentSheet = { date: formattedDate, entries: [] };
+    this.isSheetActive = true;
+    this.isCurrentSheet = true;
+    this.entries = [];
+    this.toast.success('Nouvelle fiche démarrée pour la date : ' + formattedDate);
+  }).catch((error) => {
+    this.toast.error("Erreur d'initialisation de la base de données : " + error);
+  });
+}
+
+
+,
+async saveDailySheet() {
   if (!this.currentSheet?.date) {
-    alert('Aucune fiche en cours. Veuillez démarrer une nouvelle fiche.');
+    this.toast.warning('Aucune fiche en cours. Veuillez démarrer une nouvelle fiche.');
     return;
   }
-
+  console.log("Données de la fiche à sauvegarder :", this.currentSheet);
   // Crée une copie sérialisée de `currentSheet` pour éviter les erreurs de clonage
   const sheetData = JSON.parse(JSON.stringify(this.currentSheet));
   console.log("Enregistrement de la fiche avec les données :", sheetData); // Vérification des données
-  addSheet(sheetData); // Utilise la copie propre de `currentSheet`
-  alert('Fiche sauvegardée pour ' + this.currentSheet.date);
+  try {
+    await addSheet(this.currentSheet); // Ajout de `await`
+    this.toast.success('Fiche sauvegardée pour ' + this.currentSheet.date);
+  } catch (error) {
+    this.toast.error("Erreur lors de l'enregistrement de la fiche.");
+    console.error("Erreur lors de l'enregistrement:", error);
+  }
 },
     loadDailySheetFromCalendar(event) {
   // Utilise toISOString pour obtenir le format souhaité
@@ -355,7 +376,8 @@ saveDailySheet() {
     console.error("La date sélectionnée n'est pas valide.");
   }
 },
-loadDailySheet(date) {
+async loadDailySheet(date) {
+  try{
   getSheet(date, (sheet) => {
     if (sheet) {
       console.log('Fiche récupérée:', sheet); // Vérification de la fiche
@@ -363,12 +385,14 @@ loadDailySheet(date) {
       this.entries = sheet.entries || []; // Assure que les entrées sont visibles
       this.isSheetActive = true;
       this.isCurrentSheet = date === new Date().toISOString().split('T')[0];
-      alert('Fiche chargée pour la date : ' + date);
-    } else {
-      this.isSheetActive = false;
-      alert('Aucune fiche trouvée pour cette date.');
-    }
-  });
+      this.toast.success('Fiche chargée pour la date : ' + date);
+        } else {
+          this.toast.warning('Aucune fiche trouvée pour cette date.');
+          this.isSheetActive = false;
+        }
+      })}catch(error) {
+        this.toast.error("Erreur lors de la récupération de la fiche : " + error);
+  }
 },
 checkForPreviousLocation() {
   const clientName = this.newEntry.clientName;
@@ -453,6 +477,7 @@ checkForPreviousLocation() {
     },
   },
   async mounted() {
+    this.toast = useToast();
     try {
       await initDB();
       this.loadHistoryDates();

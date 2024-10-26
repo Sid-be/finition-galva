@@ -60,10 +60,11 @@ export function getClients(callback) {
 
 // Fonction pour ajouter une fiche de plongée
 export function addSheet(sheet) {
-  const transaction = db.transaction(['dailySheets'], 'readwrite');
+  const transaction = db.transaction(['dailySheets'], 'readwrite'); // Corrigé en dailySheets
   const sheetStore = transaction.objectStore('dailySheets');
-  sheetStore.put(sheet);
-  console.log(sheet); // Utilisation de `put` pour éviter les doublons par date
+  const serializableSheet = JSON.parse(JSON.stringify(sheet));
+  
+  sheetStore.put(serializableSheet); // Enregistrement de la fiche
 }
 
 // Fonction pour récupérer une fiche de plongée par date
