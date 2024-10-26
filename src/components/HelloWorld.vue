@@ -203,6 +203,7 @@
 </template>
 
 <script>
+import { initDB, addClient,  addSheet, getSheet} from '../db.js';
 import { nextTick } from 'vue';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
@@ -325,27 +326,26 @@ export default {
     printPage() {
       window.print();
     },
-    startNewDailySheet() {
-      this.entries = [];
-      this.isSheetActive = true;
-      this.currentDate = new Date().toISOString().split('T')[0];
-      this.isCurrentSheet = true;
-      this.newEntry.appareil = this.lastAppareil || ''; // Définit l'appareil par défaut
-      alert('Nouvelle fiche démarrée pour la date : ' + this.currentDate);
-    },
-    saveDailySheet() {
-      if (!this.currentDate) {
-        alert('Aucune fiche en cours. Veuillez démarrer une nouvelle fiche.');
-        return;
-      }
-      const dateKey = this.currentDate;
-      localStorage.setItem(dateKey, JSON.stringify(this.entries));
-      if (!this.historyDates.includes(dateKey)) {
-        this.historyDates.push(dateKey);
-        localStorage.setItem('historyDates', JSON.stringify(this.historyDates));
-      }
-      alert('Fiche sauvegardée pour ' + dateKey);
-    },
+
+    async startNewDailySheet() {
+  await initDB();
+  this.currentSheet = { date: new Date().toISOString().split('T')[0], entries: [] };
+  this.isSheetActive = true;
+  this.isCurrentSheet = true;
+  alert('Nouvelle fiche démarrée pour la date : ' + this.currentSheet.date);
+},
+saveDailySheet() {
+  if (!this.currentSheet?.date) {
+    alert('Aucune fiche en cours. Veuillez démarrer une nouvelle fiche.');
+    return;
+  }
+
+  // Crée une copie sérialisée de `currentSheet` pour éviter les erreurs de clonage
+  const sheetData = JSON.parse(JSON.stringify(this.currentSheet));
+  console.log("Enregistrement de la fiche avec les données :", sheetData); // Vérification des données
+  addSheet(sheetData); // Utilise la copie propre de `currentSheet`
+  alert('Fiche sauvegardée pour ' + this.currentSheet.date);
+},
     loadDailySheetFromCalendar(event) {
   // Utilise toISOString pour obtenir le format souhaité
   const selectedDate = event.toISOString().substring(0, 10);
@@ -355,28 +355,30 @@ export default {
     console.error("La date sélectionnée n'est pas valide.");
   }
 },
-    loadDailySheet(date) {
-      const savedEntries = localStorage.getItem(date);
-      if (savedEntries) {
-        this.entries = JSON.parse(savedEntries);
-        this.currentDate = date;
-        this.isSheetActive = true;
-        this.isCurrentSheet = date === new Date().toISOString().split('T')[0]; // Met à jour isCurrentSheet
+loadDailySheet(date) {
+  getSheet(date, (sheet) => {
+    if (sheet) {
+      console.log('Fiche récupérée:', sheet); // Vérification de la fiche
+      this.currentSheet = sheet;
+      this.entries = sheet.entries || []; // Assure que les entrées sont visibles
+      this.isSheetActive = true;
+      this.isCurrentSheet = date === new Date().toISOString().split('T')[0];
       alert('Fiche chargée pour la date : ' + date);
     } else {
       this.isSheetActive = false;
       alert('Aucune fiche trouvée pour cette date.');
     }
-    },
-    checkForPreviousLocation() {
-      const clientName = this.newEntry.clientName;
-      const clientNumber = this.newEntry.clientNumber;
+  });
+},
+checkForPreviousLocation() {
+  const clientName = this.newEntry.clientName;
+  const clientNumber = this.newEntry.clientNumber;
 
-      // Vérifie si un emplacement est déjà enregistré pour ce client et ce numéro
-      if (this.lastLocations[clientName]?.[clientNumber]) {
-        this.newEntry.emplacement = this.lastLocations[clientName][clientNumber];
-      }
-    },
+  // Vérifie si un emplacement est déjà enregistré pour ce client et ce numéro
+  if (this.lastLocations[clientName]?.[clientNumber]) {
+    this.newEntry.emplacement = this.lastLocations[clientName][clientNumber];
+  }
+},
     addEntry() {
       const validLots = this.newEntry.lots.filter((lot) => lot.weight > 0);
       const totalWeight = validLots.reduce((sum, lot) => sum + lot.weight, 0);
@@ -395,6 +397,8 @@ export default {
         this.lastLocations[entry.clientName] = {};
       }
       this.lastLocations[entry.clientName][entry.clientNumber] = entry.emplacement;
+      this.currentSheet.entries.push(entry);
+      addClient(entry);
       this.entries.push(entry);
 
       // Réinitialise les valeurs pour la prochaine entrée
@@ -448,9 +452,16 @@ export default {
       this.historyDates = dates ? JSON.parse(dates) : [];
     },
   },
-  mounted() {
-    this.loadHistoryDates();
-  },
+  async mounted() {
+    try {
+      await initDB();
+      this.loadHistoryDates();
+      console.log("Base de données prête");
+    } catch (error) {
+      console.error("Erreur lors de l'initialisation de la base de données", error);
+    }
+  }
+  
 };
 </script>
 
