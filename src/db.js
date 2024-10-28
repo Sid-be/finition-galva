@@ -42,20 +42,27 @@ export function addClient(data) {
   const serializableData = JSON.parse(JSON.stringify(data));
   objectStore.add(serializableData);
 }
-
 // Fonction pour récupérer les clients
 export function getClients(callback) {
   const transaction = db.transaction(['clients'], 'readonly');
   const objectStore = transaction.objectStore('clients');
   const request = objectStore.getAll();
 
-  request.onsuccess = (event) => {
-    callback(event.target.result);
-  };
+  return new Promise((resolve, reject) => {
+    request.onsuccess = (event) => {
+      const result = event.target.result;
+      if (callback && typeof callback === 'function') {
+        callback(result);
+      } else {
+        resolve(result); // Résout la promesse si aucun callback n'est fourni
+      }
+    };
 
-  request.onerror = (event) => {
-    console.error('Erreur lors de la récupération des clients', event);
-  };
+    request.onerror = (event) => {
+      console.error('Erreur lors de la récupération des clients', event);
+      reject(event);
+    };
+  });
 }
 
 // Fonction pour ajouter une fiche de plongée

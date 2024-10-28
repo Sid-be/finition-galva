@@ -1,0 +1,6 @@
+{
+  "appId": "com.galva.app",
+  "appName": "gestion-appareils",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

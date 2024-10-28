@@ -1,62 +1,62 @@
 <template>
-  <div class="container mx-auto p-10 bg-white">
+  <div class="container mx-auto p-4 sm:p-6 md:p-10 bg-white">
     <!-- Section des boutons et du titre -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-semibold text-gray-900">Entrées de Plongée</h1>
-        <p class="text-sm text-gray-500">
+    <div class="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0">
+      <div class="text-center sm:text-left">
+        <h1 class="text-lg sm:text-xl font-semibold text-gray-900">Entrées de Plongée</h1>
+        <p class="text-xs sm:text-sm text-gray-500">
           Liste des entrées regroupées par appareil, avec détails des clients et des lots.
         </p>
       </div>
-      <div class="no-print">
+      <div class="flex flex-wrap justify-center sm:justify-end space-x-1 sm:space-x-2 mt-2 sm:mt-0 no-print">
         <button
           @click="startNewDailySheet"
-          class="bg-green-600 text-white px-4 py-2 rounded-md font-medium hover:bg-green-500 mr-2"
+          class="bg-green-600 text-white text-xs sm:text-sm px-2 py-1 rounded-md font-medium hover:bg-green-500"
         >
           Nouvelle Fiche
         </button>
         <button
-  v-if="isSheetActive && isCurrentSheet"
-  @click="showAddEntryModal = true"
-  class="bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-500 mr-2"
->
-  Ajouter une entrée
-</button>
+          v-if="isSheetActive && isCurrentSheet"
+          @click="showAddEntryModal = true"
+          class="bg-blue-600 text-white text-xs sm:text-sm px-2 py-1 rounded-md font-medium hover:bg-blue-500"
+        >
+          Ajouter une entrée
+        </button>
         <button
           v-if="isSheetActive"
           @click="saveDailySheet"
-          class="bg-yellow-600 text-white px-4 py-2 rounded-md font-medium hover:bg-yellow-500"
+          class="bg-yellow-600 text-white text-xs sm:text-sm px-2 py-1 rounded-md font-medium hover:bg-yellow-500"
         >
-          Sauvegarder la Fiche Actuelle
+          Sauvegarder
         </button>
         <!-- Bouton Aperçu avant impression -->
         <button
           @click="printPage"
-          class="bg-purple-600 text-white px-4 py-2 rounded-md font-medium hover:bg-purple-500"
+          class="bg-purple-600 text-white text-xs sm:text-sm px-2 py-1 rounded-md font-medium hover:bg-purple-500"
         >
           Aperçu avant impression
         </button>
       </div>
     </div>
 
-    <!-- Table des entrées par appareil -->
-    <div v-if="entries.length > 0" class="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
+    <!-- Table des entrées par appareil avec défilement horizontal -->
+    <div v-if="entries.length > 0" class="mt-6 bg-white shadow overflow-x-auto sm:overflow-hidden sm:rounded-lg">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Nom du Client
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Numéro du Client
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Emplacement
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Poids Total
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Détails des Lots
             </th>
           </tr>
@@ -64,24 +64,24 @@
         <tbody class="bg-white divide-y divide-gray-200">
           <template v-for="(entryGroup, appareil) in groupedEntries" :key="appareil">
             <tr class="bg-gray-100">
-              <th colspan="5" class="px-6 py-2 font-semibold text-gray-900 text-left">
+              <th colspan="5" class="px-2 py-2 font-semibold text-gray-900 text-left">
                 {{ appareil }}
               </th>
             </tr>
             <tr v-for="(entry, index) in entryGroup" :key="index">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              <td class="px-2 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                 {{ entry.clientName }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-2 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                 {{ entry.clientNumber }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-2 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                 {{ entry.emplacement }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-2 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                 {{ entry.totalWeight }} kg
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-2 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                 <ul>
                   <li v-for="(lot, lotIndex) in entry.lots" :key="lotIndex">
                     Lot {{ lotIndex + 1 }}: {{ lot.weight }} kg
@@ -95,10 +95,10 @@
     </div>
 
     <!-- Historique des fiches sous forme de calendrier -->
-    <div class="mt-6 no-print">
+    <div class="mt-6 no-print relative z-0">
       <h2 class="text-lg font-semibold mb-4">Historique des Fiches</h2>
       <vue-cal
-        style="height: 400px;"
+        style="height: 400px; z-index: 0;"
         :events="formattedHistoryDates"
         @cell-click="loadDailySheetFromCalendar"
         :time="false"
@@ -111,9 +111,9 @@
     <!-- Modal pour ajouter une nouvelle entrée -->
     <div
       v-if="showAddEntryModal"
-      class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 no-print"
+      class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 no-print z-50"
     >
-      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+      <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-11/12 sm:w-96">
         <h2 class="text-lg font-semibold mb-4">Ajouter une Nouvelle Entrée</h2>
 
         <!-- Formulaire pour les informations de la nouvelle entrée -->
@@ -125,24 +125,34 @@
           </select>
 
           <label class="block mb-2">Nom du client</label>
-    <input
-      v-model="newEntry.clientName"
-      @input="updateClientNumbers"
-      type="text"
-      class="border rounded w-full p-2 mb-2"
-      placeholder="Nom du client"
-      required
-    />
-          <ul v-if="filteredClientNames.length" class="border rounded-md bg-white shadow-md max-h-40 overflow-y-auto mt-1">
-            <li
-              v-for="client in filteredClientNames"
-              :key="client"
-              @click="selectClientName(client)"
-              class="p-2 hover:bg-blue-100 cursor-pointer"
-            >
-              {{ client }}
-            </li>
-          </ul>
+        <div class="relative p-4">
+          <div class="absolute bottom-0 left-0 right-0 top-8 bg-slate-900/[0.03] z-0"></div>
+          <div class="pointer-events-auto relative z-10 rounded-lg bg-white text-[0.8125rem] leading-5 text-slate-700 shadow-xl shadow-black/5 ring-1 ring-slate-700/10">
+            <div class="flex items-center px-3.5 py-2.5 text-slate-400">
+              <svg class="mr-2 h-5 w-5 stroke-slate-500" fill="none" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input
+                v-model="newEntry.clientName"
+                @input="filterClients"
+                type="text"
+                class="bg-transparent outline-none text-slate-700 w-full"
+                placeholder="Nom du client"
+                required
+              />
+            </div>
+
+            <!-- Suggestions de clients -->
+            <div v-if="filteredClientNames.length" class="border-t border-slate-400/20 px-3.5 py-3">
+              <div v-for="client in filteredClientNames" :key="client" @click="selectClientName(client)" class="flex items-center rounded-md p-1.5 cursor-pointer hover:bg-indigo-100 transition">
+                <svg class="mr-2.5 h-5 w-5 flex-none stroke-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                </svg>
+                <span>{{ client }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
           <label class="block mt-4 mb-2">Numéro du client</label>
           <input
@@ -202,8 +212,9 @@
   </div>
 </template>
 
+
 <script>
-import { initDB, addClient,  addSheet, getSheet} from '../db.js';
+import { initDB, addClient, addSheet, getSheet, getClients } from '../db.js';
 import { useToast } from 'vue-toastification';
 import { nextTick } from 'vue';
 import VueCal from 'vue-cal';
@@ -220,6 +231,7 @@ export default {
       isSheetActive: false,
       isCurrentSheet: true,
       lastAppareil: '',
+      filteredClientNames: [],
       newEntry: {
         appareil: '',
         clientName: '',
@@ -229,61 +241,10 @@ export default {
       },
       currentDate: null,
       historyDates: [],
-      allAppareilNames: [
-        'S1',
-        'S2',
-        'S3',
-        'S4',
-        'S5',
-        'S6',
-        'DM1',
-        'A1',
-        'A2',
-        'M1',
-        'M2',
-        'CH',
-        'GL01',
-        'GL02',
-        'G10',
-        'G11',
-        'G12',
-        'G13',
-        'G14',
-        'G15',
-        'G16',
-        'G17',
-        'G18',
-        'G19',
-        'G20',
-      ],
-      parcLocations: [
-        'A',
-        'B',
-        'C',
-        'D',
-        'E',
-        'F',
-        'G',
-        'H',
-        'I',
-        'J',
-        'K',
-        'L',
-        'M',
-        'N',
-        'O',
-        'P',
-        'Q',
-        'R',
-        'S',
-        'T',
-        'U',
-        'V',
-        'W',
-        'X',
-      ],
-      clientData: {},
-      lastLocations: {},
+      allAppareilNames: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'DM1', 'A1', 'A2', 'M1', 'M2', 'CH', 'GL01', 'GL02', 'G10', 'G11', 'G12', 'G13', 'G14', 'G15', 'G16', 'G17', 'G18', 'G19', 'G20'],
+      parcLocations: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X'],
+      clientData: {}, // Liste de tous les clients chargés depuis IndexedDB
+      lastLocations: JSON.parse(localStorage.getItem('lastLocations')) || {},
     };
   },
   computed: {
@@ -298,112 +259,116 @@ export default {
       }, {});
     },
     formattedHistoryDates() {
-      return this.historyDates
-        .map((date) => {
-          const parsedDate = new Date(date);
-          if (isNaN(parsedDate.getTime())) return null;
-          return {
-            start: parsedDate.toISOString().split('T')[0],
-            end: parsedDate.toISOString().split('T')[0],
-            title: 'Fiche',
-          };
-        })
-        .filter((event) => event !== null);
-    },
-    filteredClientNames() {
-      const input = this.newEntry.clientName.toLowerCase();
-      return Object.keys(this.clientData).filter(
-        (name) => name.toLowerCase().includes(input) && name.toLowerCase() !== input
-      );
-    },
-    filteredClientNumbers() {
-      const clientName = this.newEntry.clientName;
-      const clientNumbers = this.clientData[clientName] || [];
-      const input = this.newEntry.clientNumber;
-      return clientNumbers.filter((num) => num.includes(input) && num !== input);
+      return this.historyDates.map((date) => {
+        const parsedDate = new Date(date);
+        if (isNaN(parsedDate.getTime())) return null;
+        return {
+          start: parsedDate.toISOString().split('T')[0],
+          end: parsedDate.toISOString().split('T')[0],
+          title: 'Fiche',
+        };
+      }).filter((event) => event !== null);
     },
   },
   methods: {
     printPage() {
       window.print();
     },
-
+    async filterClients() {
+      const searchInput = this.newEntry.clientName.toLowerCase();
+      if (searchInput.length > 1) {
+        this.filteredClientNames = Object.keys(this.clientData).filter(clientName => clientName.toLowerCase().includes(searchInput));
+      } else {
+        this.filteredClientNames = [];
+      }
+    },
+    selectClientName(clientName) {
+      this.newEntry.clientName = clientName;
+      this.filteredClientNames = [];
+      if (this.clientData[clientName]) {
+        this.newEntry.clientNumber = this.clientData[clientName][0];
+        this.checkForPreviousLocation();
+      }
+    },
+    checkForPreviousLocation() {
+      const clientName = this.newEntry.clientName;
+      const clientNumber = this.newEntry.clientNumber;
+      if (this.lastLocations[clientName]?.[clientNumber]) {
+        this.newEntry.emplacement = this.lastLocations[clientName][clientNumber];
+      }
+    },
     async startNewDailySheet() {
-  initDB().then(() => {
-    // Obtenir la date locale sans le décalage UTC
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    
-    const formattedDate = `${year}-${month}-${day}`; // Format YYYY-MM-DD sans décalage
+      try {
+        await initDB();
+        const today = new Date();
+        const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-    this.currentSheet = { date: formattedDate, entries: [] };
-    this.isSheetActive = true;
-    this.isCurrentSheet = true;
-    this.entries = [];
-    this.toast.success('Nouvelle fiche démarrée pour la date : ' + formattedDate);
-  }).catch((error) => {
-    this.toast.error("Erreur d'initialisation de la base de données : " + error);
-  });
-}
-
-
-,
-async saveDailySheet() {
-  if (!this.currentSheet?.date) {
-    this.toast.warning('Aucune fiche en cours. Veuillez démarrer une nouvelle fiche.');
-    return;
-  }
-  console.log("Données de la fiche à sauvegarder :", this.currentSheet);
-  // Crée une copie sérialisée de `currentSheet` pour éviter les erreurs de clonage
-  const sheetData = JSON.parse(JSON.stringify(this.currentSheet));
-  console.log("Enregistrement de la fiche avec les données :", sheetData); // Vérification des données
-  try {
-    await addSheet(this.currentSheet); // Ajout de `await`
-    this.toast.success('Fiche sauvegardée pour ' + this.currentSheet.date);
-  } catch (error) {
-    this.toast.error("Erreur lors de l'enregistrement de la fiche.");
-    console.error("Erreur lors de l'enregistrement:", error);
-  }
-},
+        this.newEntry.appareil = '';
+        this.currentSheet = { date: formattedDate, entries: [] };
+        this.isSheetActive = true;
+        this.isCurrentSheet = true;
+        this.entries = [];
+        this.toast.success('Nouvelle fiche démarrée pour la date : ' + formattedDate);
+      } catch (error) {
+        this.toast.error("Erreur d'initialisation de la base de données : " + error);
+      }
+    },
+    async saveDailySheet() {
+      if (!this.currentSheet?.date) {
+        this.toast.warning('Aucune fiche en cours. Veuillez démarrer une nouvelle fiche.');
+        return;
+      }
+      try {
+        await addSheet(this.currentSheet);
+        this.toast.success('Fiche sauvegardée pour ' + this.currentSheet.date);
+      } catch (error) {
+        this.toast.error("Erreur lors de l'enregistrement de la fiche.");
+      }
+    },
     loadDailySheetFromCalendar(event) {
-  // Utilise toISOString pour obtenir le format souhaité
-  const selectedDate = event.toISOString().substring(0, 10);
-  if (selectedDate) {
-    this.loadDailySheet(selectedDate);
-  } else {
-    console.error("La date sélectionnée n'est pas valide.");
-  }
-},
-async loadDailySheet(date) {
-  try{
-  getSheet(date, (sheet) => {
-    if (sheet) {
-      console.log('Fiche récupérée:', sheet); // Vérification de la fiche
-      this.currentSheet = sheet;
-      this.entries = sheet.entries || []; // Assure que les entrées sont visibles
-      this.isSheetActive = true;
-      this.isCurrentSheet = date === new Date().toISOString().split('T')[0];
-      this.toast.success('Fiche chargée pour la date : ' + date);
+      const selectedDate = event.toISOString().split('T')[0];
+      if (selectedDate) {
+        this.loadDailySheet(selectedDate);
+      }
+    },
+    async loadDailySheet(date) {
+      getSheet(date, (sheet) => {
+        if (sheet) {
+          this.currentSheet = sheet;
+          this.entries = sheet.entries || [];
+          this.isSheetActive = true;
+          this.isCurrentSheet = date === new Date().toISOString().split('T')[0];
+          this.toast.success('Fiche chargée pour la date : ' + date);
         } else {
-          this.toast.warning('Aucune fiche trouvée pour cette date.');
           this.isSheetActive = false;
+          this.toast.warning('Aucune fiche trouvée pour cette date.');
         }
-      })}catch(error) {
-        this.toast.error("Erreur lors de la récupération de la fiche : " + error);
-  }
-},
-checkForPreviousLocation() {
-  const clientName = this.newEntry.clientName;
-  const clientNumber = this.newEntry.clientNumber;
-
-  // Vérifie si un emplacement est déjà enregistré pour ce client et ce numéro
-  if (this.lastLocations[clientName]?.[clientNumber]) {
-    this.newEntry.emplacement = this.lastLocations[clientName][clientNumber];
-  }
-},
+      });
+    },
+    addLot() {
+      this.newEntry.lots.push({ weight: 0 });
+      nextTick(() => {
+        const lotInputs = document.querySelectorAll('.lot-input');
+        if (lotInputs.length > 0) {
+          lotInputs[lotInputs.length - 1].focus();
+        }
+      });
+    },
+    addLotOnEnter(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        this.addLot();
+      }
+    },
     addEntry() {
+      const clientExists = Object.keys(this.clientData).includes(this.newEntry.clientName);
+      if (!clientExists) {
+        const newClient = { name: this.newEntry.clientName, number: this.newEntry.clientNumber };
+        addClient(newClient);
+        this.clientData[this.newEntry.clientName] = [this.newEntry.clientNumber];
+        this.toast.success(`Client ${newClient.name} ajouté avec succès`);
+      }
+
       const validLots = this.newEntry.lots.filter((lot) => lot.weight > 0);
       const totalWeight = validLots.reduce((sum, lot) => sum + lot.weight, 0);
 
@@ -416,18 +381,19 @@ checkForPreviousLocation() {
         totalWeight,
       };
 
-      this.lastAppareil = this.newEntry.appareil; // Enregistre l’appareil pour la prochaine entrée
       if (!this.lastLocations[entry.clientName]) {
         this.lastLocations[entry.clientName] = {};
       }
       this.lastLocations[entry.clientName][entry.clientNumber] = entry.emplacement;
-      this.currentSheet.entries.push(entry);
-      addClient(entry);
-      this.entries.push(entry);
+      localStorage.setItem('lastLocations', JSON.stringify(this.lastLocations));
 
-      // Réinitialise les valeurs pour la prochaine entrée
+      this.entries.push(entry);
+      this.currentSheet.entries.push(entry);
+
+      const currentAppareil = this.newEntry.appareil;
+
       this.newEntry = {
-        appareil: this.lastAppareil, // Rétablit l’appareil enregistré
+        appareil: currentAppareil,
         clientName: '',
         clientNumber: '',
         emplacement: '',
@@ -435,41 +401,8 @@ checkForPreviousLocation() {
       };
       this.showAddEntryModal = false;
     },
-    updateClientNumbers() {
-      const clientName = this.newEntry.clientName;
-      if (this.clientData[clientName]) {
-        // Les numéros de client seront suggérés
-      } else {
-        this.newEntry.clientNumber = '';
-      }
-    },
- 
-    selectClientName(client) {
-      this.newEntry.clientName = client;
-      this.updateClientNumbers();
-    },
-    selectClientNumber(number) {
-      this.newEntry.clientNumber = number;
-      this.checkForPreviousLocation();
-    },
-    addLotOnEnter(event) {
-      if (event.key === 'Enter') {
-        event.preventDefault(); // Empêche le comportement par défaut
-        this.addLot();
-      }
-    },
-    addLot() {
-      this.newEntry.lots.push({ weight: 0 });
-      nextTick(() => {
-        const lotInputs = document.querySelectorAll('.lot-input');
-        if (lotInputs.length > 0) {
-          // Place le focus sur le dernier champ ajouté
-          lotInputs[lotInputs.length - 1].focus();
-        }
-      });
-    },
-    removeLot(index) {
-      this.newEntry.lots.splice(index, 1);
+    async loadClients() {
+      this.clientData = await getClients() || {};
     },
     loadHistoryDates() {
       const dates = localStorage.getItem('historyDates');
@@ -478,17 +411,14 @@ checkForPreviousLocation() {
   },
   async mounted() {
     this.toast = useToast();
-    try {
-      await initDB();
-      this.loadHistoryDates();
-      console.log("Base de données prête");
-    } catch (error) {
-      console.error("Erreur lors de l'initialisation de la base de données", error);
-    }
-  }
-  
+    await initDB();
+    await this.loadClients();
+    this.loadHistoryDates();
+  },
 };
 </script>
+
+
 
 <style>
 @import 'vue-cal/dist/vuecal.css';
