@@ -7,7 +7,7 @@ import 'vue-toastification/dist/index.css';
 const app = createApp(App);
 
 app.use(Toast, {
-  // Options, personnalise selon tes préférences
+ 
   position: POSITION.TOP_RIGHT,
   timeout: 3000,
   closeOnClick: true,
