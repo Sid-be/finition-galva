@@ -5,9 +5,13 @@ module.exports = {
   theme: {
     extend: {}, // Tu peux étendre les classes Tailwind ici si nécessaire
   },
+  content: [
+    
+    'node_modules/flowbite-vue/**/*.{js,jsx,ts,tsx}'
+  ],
   variants: {
     extend: {}, // Pour ajouter des variantes de styles
   },
-  plugins: [], // Tu peux ajouter des plugins si nécessaire
+  plugins: [require('flowbite/plugin')],
 }
 
