@@ -304,6 +304,7 @@ import { PrintWebview } from 'capacitor-print-webview';
 
 
 export default {
+  name: 'FicheJournaliere',
   components: { VueCal },
   data() {
     return {

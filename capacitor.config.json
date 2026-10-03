@@ -1,6 +1,6 @@
 {
-  "appId": "com.galva.app",
-  "appName": "gestion-appareils",
+  "appId": "com.sidbenaissa.finitiongalva",
+  "appName": "Finition Galva",
   "webDir": "dist",
   "bundledWebRuntime": false
 }
