@@ -5,6 +5,16 @@ Application de saisie des **fiches journalières de finition** pour un atelier d
 Projet personnel, conçu à partir d'un besoin observé sur le terrain : remplacer une fiche papier
 recopiée à la main par une saisie rapide, utilisable debout dans l'atelier, et consultable ensuite.
 
+![Fiche du jour, entrées groupées par appareil](docs/fiche.png)
+
+*La fiche du jour : entrées regroupées par appareil, poids totaux calculés, détail des lots,
+et l'historique au calendrier. Les données affichées sont fictives.*
+
+![Saisie d'une entrée](docs/saisie.png)
+
+*La saisie d'une entrée : appareil, client avec complétion automatique, emplacement de parc
+et lots multiples.*
+
 **Compilée en application Android via Capacitor, installée sur un terminal et testée en
 conditions réelles à l'atelier, avec l'accord de la hiérarchie.** Les choix décrits plus bas
 ne sont donc pas théoriques : ils ont été validés, ou corrigés, par l'usage.
