@@ -77,7 +77,7 @@
   </div>
     <div class="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0">
       <div class="text-center sm:text-left">
-        <h1 class="text-lg sm:text-xl font-semibold text-gray-900">Cariste: BENAISSA  - Horaires: 06h-14h</h1>
+        <h1 class="text-lg sm:text-xl font-semibold text-gray-900">Fiche de finition</h1>
         <p class="text-xs sm:text-sm text-gray-500">Liste des entrées regroupées par appareil, avec détails des clients et des lots.</p>
       </div>
       <div class="flex flex-wrap justify-center sm:justify-end space-x-1 sm:space-x-2 mt-2 sm:mt-0 no-print">
@@ -294,7 +294,7 @@
 </template>
 
 <script>
-import { initDB, deleteEntryFromSheet, addClient, addSheet, getSheet, getClients, addLastLocation, getLastLocation,deleteSheetEntry } from '../db.js';
+import { initDB, deleteEntryFromSheet, addClient, addSheet, getSheet, getAllSheets, getClients, addLastLocation, getLastLocation,deleteSheetEntry } from '../db.js';
 
 import { useToast } from 'vue-toastification';
 import { nextTick } from 'vue';
@@ -527,6 +527,7 @@ export default {
     const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const sheetClone = { ...this.currentSheet, date: formattedDate };
     await addSheet(sheetClone);
+        await this.loadHistoryDates();
         this.toast.success('Sauvegarde automatique réussie pour la date : ' + this.currentSheet.date);
       } catch (error) {
         this.toast.error("Erreur lors de la sauvegarde automatique.");
@@ -625,9 +626,16 @@ export default {
         }, {});
       }
     },
-    loadHistoryDates() {
-      const dates = localStorage.getItem('historyDates');
-      this.historyDates = dates ? JSON.parse(dates) : [];
+    async loadHistoryDates() {
+      // Les fiches sont stockees dans IndexedDB. On lit donc la source reelle,
+      // et non plus localStorage qui n'est plus alimente depuis la migration.
+      try {
+        const sheets = await getAllSheets();
+        this.historyDates = sheets.map((sheet) => sheet.date).filter(Boolean);
+      } catch (error) {
+        console.error("Erreur lors du chargement de l'historique des fiches :", error);
+        this.historyDates = [];
+      }
     },
     async loadTodaySheet() {
     const today = new Date();
@@ -648,7 +656,7 @@ export default {
     this.toast = useToast();
     await initDB();
     await this.loadClients();
-    this.loadHistoryDates();
+    await this.loadHistoryDates();
     await this.loadTodaySheet();
     this.autoSaveInterval = setInterval(() => {
       if (this.isSheetActive) {
